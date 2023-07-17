@@ -22,7 +22,8 @@ export class Config {
     public DB_CONNECTIONS = process.env.DB_CONNECTIONS || 1; //number of connections allowed in pool
     public REQUEST_TIMEOUT = process.env.REQUEST_TIMEOUT || 60000; // milliseconds
     public OPEN_BREWERY_URL = process.env.OPEN_BREWERY_URL || 'https://api.openbrewerydb.org/v1';
-    public STORMGLASS_API_KEY = process.env.STORMGLASS_API_KEY;
+    public STORM_GLASS_URL = process.env.STORM_GLASS_URL || 'https://api.stormglass.io/v2';
+    public STORM_GLASS_API_KEY = process.env.STORM_GLASS_API_KEY;
 
     constructor() {
         // Ensure all required environment variables have been provided.
