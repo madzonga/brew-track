@@ -1,10 +1,15 @@
 import { Express, Request, Response } from 'express';
 import { Config } from '../config';
 import { getAllBreweries, getBrewery, getBreweryWeather } from '../helpers/open-brewery-get-calls';
+import { Pool } from 'mysql';
+import { Database } from '../lib/database';
+import { getAllBreweriesFromDb } from '../handlers';
 
 class Routes {
+  pool: Pool;
 
     constructor(private config: Config) {
+      this.pool = new Database(config).pool;
     }
 
     public routes(app: Express): void {
@@ -28,14 +33,13 @@ class Routes {
          */
         app.get('/get-all-breweries', async (req: Request, res: Response) => {
             try {
-                let result = await getAllBreweries({config: this.config, req, res });
-                return res.status(200).json(result);
+                let allBreweries = await getAllBreweries({config: this.config, pool: this.pool, req, res });
+                return res.status(200).json(allBreweries);
             } catch (error: any) {
-                return res.status(400).json({
-                    error: true,
-                    message: 'Custom error message goes here',
-                    data: res
-                });
+              console.log(error);
+              let allBreweriesFromDb = await getAllBreweriesFromDb({req, id: '1', pool: this.pool})
+              console.log(allBreweriesFromDb)
+              return res.status(200).json(JSON.parse(allBreweriesFromDb as string));
             }
         
         });

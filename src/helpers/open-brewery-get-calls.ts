@@ -4,29 +4,39 @@ import axios, { AxiosError } from 'axios';
 import { Request, Response } from 'express';
 import Joi from 'joi';
 import { handleAxiosError } from "./error";
+import { Pool } from "mysql";
 
 const getAllBreweriesSchema = Joi.object({
   config: Joi.object().required(),
+  pool: Joi.any().required(),
   req: Joi.object().required(),
   res: Joi.object().required(),
 });
 
 export const getAllBreweries = async (params: {
   config: Config;
+  pool: Pool;
   req: Request;
   res: Response;
 }) => {
-  const { config, req, res } = params;
-
-  const validationResult = getAllBreweriesSchema.validate(params);
-  if (validationResult.error) {
-    throw new Error(validationResult.error.details[0].message);
-  }
-
+  const { config, pool, req, res } = params;
   try {
+    const validationResult = getAllBreweriesSchema.validate(params);
+    if (validationResult.error) {
+      throw new Error(validationResult.error.details[0].message);
+    }
     res.set('Access-Control-Allow-Origin', 'http://localhost:4200');
     const result = await axios.get(config.OPEN_BREWERY_URL + `/breweries`, {
       timeout: config.REQUEST_TIMEOUT as number,
+    });
+    console.log(JSON.stringify(result.data));
+    let allBreweries = {
+      id: 1,
+      all_breweries: JSON.stringify(result.data),
+    };
+    const sqlQuery = 'INSERT INTO brewery_persistence SET ? ON DUPLICATE KEY UPDATE all_breweries = VALUES(all_breweries)';
+    pool.query(sqlQuery, allBreweries, async (error, row) => {
+      if (error) console.error(error);
     });
     return result.data;
   } catch (error) {

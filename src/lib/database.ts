@@ -5,7 +5,7 @@ import mysql, { Pool } from 'mysql';
 export class Database {
     public pool: Pool;
 
-    constructor(private logger: Logger, private config: Config) {
+    constructor(private config: Config) {
         this.pool = mysql.createPool({
             host: config.DB_HOST,
             user: config.DB_USER,
@@ -17,19 +17,19 @@ export class Database {
         this.pool.getConnection((err, connection) => {
             if (err) {
                 if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-                    logger.error('Database connection lost');
+                    console.error('Database connection lost');
                 }
 
                 if (err.code === 'ER_CON_COUNT_ERROR') {
-                    logger.error('Database has too many connections');
+                    console.error('Database has too many connections');
                 }
 
                 if (err.code === 'ECONNREFUSED') {
-                    logger.error('Database connection was refused');
+                    console.error('Database connection was refused');
                 }
 
                 if (err.code === 'ETIMEDOUT') {
-                    logger.error('Database connection timed out');
+                    console.error('Database connection timed out');
                 }
                 throw err;
             }
@@ -40,7 +40,7 @@ export class Database {
         });
 
         this.pool.on('release', (connection) => {
-            logger.debug('Connection %d released', connection.threadId);
+            console.debug('Connection %d released', connection.threadId);
         });
     }
 }
