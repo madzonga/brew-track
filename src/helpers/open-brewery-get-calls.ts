@@ -11,6 +11,8 @@ const getAllBreweriesSchema = Joi.object({
   pool: Joi.any().required(),
   req: Joi.object().required(),
   res: Joi.object().required(),
+  offset: Joi.number().required(),
+  limit: Joi.number().required(),
 });
 
 export const getAllBreweries = async (params: {
@@ -18,8 +20,10 @@ export const getAllBreweries = async (params: {
   pool: Pool;
   req: Request;
   res: Response;
+  offset: number;
+  limit: number;
 }) => {
-  const { config, pool, req, res } = params;
+  const { config, pool, req, res, offset, limit } = params;
   try {
     const validationResult = getAllBreweriesSchema.validate(params);
     if (validationResult.error) {
@@ -29,7 +33,6 @@ export const getAllBreweries = async (params: {
     const result = await axios.get(config.OPEN_BREWERY_URL + `/breweries`, {
       timeout: config.REQUEST_TIMEOUT as number,
     });
-    console.log(JSON.stringify(result.data));
     let allBreweries = {
       id: 1,
       all_breweries: JSON.stringify(result.data),
@@ -38,8 +41,10 @@ export const getAllBreweries = async (params: {
     pool.query(sqlQuery, allBreweries, async (error, row) => {
       if (error) console.error(error);
     });
-    return result.data;
-  } catch (error) {
+    const totalItems = result.data.length;
+    const paginatedBreweries = result.data.slice(offset, offset + limit);
+    return { breweries: paginatedBreweries, totalItems };
+    } catch (error) {
     handleAxiosError(error as AxiosError);
   }
 };

@@ -4,6 +4,7 @@ import express, { Express } from 'express';
 
 import { Routes } from './routes';
 import helmet from 'helmet';
+const cors = require('cors');
 
 import http from 'http';
 
@@ -25,6 +26,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 // Load the swagger docs to https://[host]/api-doc
 app.use('/api-doc', swaggerRoute); //DO NOT CHANGE THIS ROUTE
+
+// Use the CORS middleware
+app.use(cors());
 
 /**
  * Load routes from 'routes/index.ts' and provide logger
