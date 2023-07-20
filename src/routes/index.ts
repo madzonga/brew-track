@@ -111,6 +111,63 @@ class Routes {
             }
         );
 
+        /**
+         * Endpoint to get weather data for a brewery.
+         * @swagger
+         * /get-brewery-weather/{lat}/{lng}:
+         *   get:
+         *     summary: Get weather data for a brewery.
+         *     description: Retrieves weather data for a brewery based on the provided latitude and longitude.
+         *     parameters:
+         *       - in: path
+         *         name: lat
+         *         required: true
+         *         description: The latitude of the brewery.
+         *         schema:
+         *           type: number
+         *       - in: path
+         *         name: lng
+         *         required: true
+         *         description: The longitude of the brewery.
+         *         schema:
+         *           type: number
+         *     responses:
+         *       200:
+         *         description: Successful response with weather data.
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 temperature:
+         *                   type: number
+         *                   description: The temperature at the brewery location.
+         *                 humidity:
+         *                   type: number
+         *                   description: The humidity at the brewery location.
+         *                 weatherDescription:
+         *                   type: string
+         *                   description: The description of the weather at the brewery location.
+         *       500:
+         *         description: Internal server error.
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 error:
+         *                   type: boolean
+         *                   description: Indicates if an error occurred.
+         *                   example: true
+         *                 message:
+         *                   type: string
+         *                   description: The error message.
+         *                   example: Error fetching weather data for Weather API.
+         *                 data:
+         *                   type: null
+         *                   description: The data associated with the error (set to null in case of errors).
+         *                   example: null
+         */
         app.get(
             "/get-brewery-weather/:lat/:lng",
             async (req: Request, res: Response) => {
@@ -149,43 +206,110 @@ class Routes {
          * /submit-user-data:
          *   post:
          *     summary: Submit user data.
-         *     description: Submits user data for further processing.
+         *     description: Submits user data to the server for storage.
          *     requestBody:
-         *       description: Request body containing user data.
+         *       description: User data to be submitted.
          *       required: true
          *       content:
          *         application/json:
          *           schema:
-         *             $ref: '#/components/schemas/User' // Replace with the correct schema reference for the User data.
+         *             type: object
+         *             properties:
+         *               firstName:
+         *                 type: string
+         *                 description: The first name of the user.
+         *               lastName:
+         *                 type: string
+         *                 description: The last name of the user.
+         *               email:
+         *                 type: string
+         *                 format: email
+         *                 description: The email address of the user.
+         *               age:
+         *                 type: number
+         *                 description: The age of the user.
+         *             required:
+         *               - firstName
+         *               - lastName
+         *               - email
+         *               - age
          *     responses:
          *       200:
-         *         description: Successful response.
-         *       400:
-         *         description: Bad request.
+         *         description: Successful response with submitted user data.
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 success:
+         *                   type: boolean
+         *                   description: Indicates if the user data was submitted successfully.
+         *                   example: true
+         *                 message:
+         *                   type: string
+         *                   description: A message indicating the success of the submission.
+         *                   example: User data submitted successfully.
+         *                 data:
+         *                   type: object
+         *                   description: The submitted user data.
+         *                   properties:
+         *                     firstName:
+         *                       type: string
+         *                       description: The first name of the user.
+         *                     lastName:
+         *                       type: string
+         *                       description: The last name of the user.
+         *                     email:
+         *                       type: string
+         *                       description: The email address of the user.
+         *                     age:
+         *                       type: number
+         *                       description: The age of the user.
+         *                   example:
+         *                     firstName: John
+         *                     lastName: Doe
+         *                     email: john.doe@example.com
+         *                     age: 30
          *       500:
          *         description: Internal server error.
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 success:
+         *                   type: boolean
+         *                   description: Indicates if an error occurred.
+         *                   example: false
+         *                 message:
+         *                   type: string
+         *                   description: The error message.
+         *                   example: Internal server error.
+         *                 data:
+         *                   type: null
+         *                   description: The data associated with the error (set to null in case of errors).
+         *                   example: null
          */
-        app.post('/submit-user-data', async (req: Request, res: Response) => {
-          try {
-            res.set('Access-Control-Allow-Origin', 'http://localhost:4200');
-            const userData = req.body;
-            await saveUserDataToDatabase(userData, this.pool);
-        
-            return res.status(200).json({
-              success: true,
-              message: 'User data submitted successfully.',
-              data: userData,
-            });
-          } catch (error: any) {
-            console.log(error);
-            return res.status(500).json({
-              success: false,
-              message: 'Internal server error.',
-              data: null,
-            });
-          }
+        app.post("/submit-user-data", async (req: Request, res: Response) => {
+            try {
+                res.set("Access-Control-Allow-Origin", "http://localhost:4200");
+                const userData = req.body;
+                await saveUserDataToDatabase(userData, this.pool);
+
+                return res.status(200).json({
+                    success: true,
+                    message: "User data submitted successfully.",
+                    data: userData,
+                });
+            } catch (error: any) {
+                console.log(error);
+                return res.status(500).json({
+                    success: false,
+                    message: "Internal server error.",
+                    data: null,
+                });
+            }
         });
-        
     }
 }
 export { Routes };
