@@ -29,7 +29,6 @@ export const getAllBreweries = async (params: {
     if (validationResult.error) {
       throw new Error(validationResult.error.details[0].message);
     }
-    res.set('Access-Control-Allow-Origin', 'http://localhost:4200');
     const result = await axios.get(config.OPEN_BREWERY_URL + `/breweries`, {
       timeout: config.REQUEST_TIMEOUT as number,
     });
@@ -63,7 +62,6 @@ export const getBrewery = async (params: {
   }
 
   try {
-    res.set('Access-Control-Allow-Origin', 'http://localhost:4200');
     const result = await axios.get(config.OPEN_BREWERY_URL + `/breweries/${breweryId}`, {
       timeout: config.REQUEST_TIMEOUT as number,
     });
