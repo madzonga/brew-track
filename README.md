@@ -1,4 +1,4 @@
-# bew-track
+# brew-track
 
 This service is written in [TypeScript](https://www.typescriptlang.org/), compiled/packaged in [Node.js](https://nodejs.org/en/) and uses [Express.js](https://expressjs.com/) as the HTTP routing framework.
 
@@ -38,11 +38,7 @@ The local server will start up in **development** mode and you should now be abl
 https://localhost:8443/
 ```
 
-From time to time, it would be a good idea to run `npm audit`.
-
 ## Configuration
-
-This services use configuration values stored in the environment. Each environment has it's own credentials. You can specify these using the command line or via the local.env file.
 
 Available Configs:
 
